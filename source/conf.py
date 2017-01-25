@@ -121,6 +121,7 @@ latex_elements = {
     # Additional stuff for the LaTeX preamble.
     #
     'preamble': r"""
+    \usepackage[english]{babel}
     \usepackage{xeCJK}
     \setcounter{secnumdepth}{-1}
     \defaultCJKfontfeatures{AutoFakeBold=6,AutoFakeSlant=.3}
