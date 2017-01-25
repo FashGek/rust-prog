@@ -46,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Rust 程式設計從頭開始'
+project = u'Rust 程式設計從頭開始'
 copyright = 'Michael Chen, 2017'
 author = 'Michael Chen'
 
@@ -184,7 +184,7 @@ epub_author = author
 epub_publisher = author
 epub_copyright = copyright
 
-epub_description = """\
+epub_description = u"""\
 Rust 是一套安全、快速、共時的編譯語言，可用來撰寫安全且高效能的應用程式。
 本書以初學者的角度出發，從頭開始介紹 Rust 程式設計，讓讀者可應用 Rust 解決自己的問題。"""
 
