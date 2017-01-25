@@ -1,0 +1,497 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-TW">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>泛型程式設計 &#8212; Rust 程式設計從頭開始 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="函數式程式設計" href="fp.html" />
+    <link rel="prev" title="物件導向程式設計" href="oop.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="fp.html" title="函數式程式設計"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="oop.html" title="物件導向程式設計"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rust 程式設計從頭開始 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">泛型程式設計</a><ul>
+<li><a class="reference internal" href="#id2">使用泛型的例子</a></li>
+<li><a class="reference internal" href="#id3">撰寫泛型程式</a><ul>
+<li><a class="reference internal" href="#id4">泛型函式</a></li>
+<li><a class="reference internal" href="#id5">泛型物件</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id6">實例：實作向量運算</a></li>
+<li><a class="reference internal" href="#id7">(案例選讀) 模擬方法重載</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="oop.html"
+                        title="previous chapter">物件導向程式設計</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fp.html"
+                        title="next chapter">函數式程式設計</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/advance/generics.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>泛型程式設計<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>有時候，我們希望同一個實作可以套用在不同的型別上，在 Rust，可以透過<strong>泛型 (generics)</strong> 達到這樣的效果。假設我們想實作一個向量運算的類別，如果沒有泛型，可能的 Rust 虛擬碼如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="n">IntVector</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">vec</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="p">[</span><span class="kt">i32</span><span class="p">],</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="c1">// Implement algorithm for IntVector</span>
+
+<span class="k">struct</span><span class="w"> </span><span class="n">FloatVector</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">vec</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="p">[</span><span class="kt">f64</span><span class="p">],</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="c1">// Implement algorithm for FloatVector</span>
+</pre></div>
+</div>
+<p>由以上範例可知，我們要針對不同型別重覆撰寫兩套相似的程式碼，而且，我們的實作缺乏擴充性，日後若要進行有理數 (rational number) 或是複數 (complex number) 或其他型別的運算，又得重覆撰寫相似的程式碼。泛型提供較佳的機制來解決這個問題，以泛型改寫上述例子的 Rust 虛擬碼如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">vec</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="p">[</span><span class="n">T</span><span class="p">],</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="c1">// Implement algorithm for Vector with generic type T</span>
+</pre></div>
+</div>
+<p>之後，要使用此泛型類別時，只要指定型別 <code class="docutils literal"><span class="pre">T</span></code> 即可使用這個類別。由以上範例可知，若我們實作出泛型程式後，就可以套用在不同型別上，達到程式碼再利用的效果。</p>
+<div class="section" id="id2">
+<h2>使用泛型的例子<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>在 Rust 的標準函式庫中，已有許多泛型程式的例子，像是 vector、map、set 等容器，在本書先前的內容中，已有一些使用容器的實例。另外，Rust 有一些特殊類別，內部也用到泛型的機制，像是 <code class="docutils literal"><span class="pre">Result&lt;T,</span> <span class="pre">E&gt;</span></code> 就是一個泛型 enum。以下是使用 <code class="docutils literal"><span class="pre">Result</span></code> 的實例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="s">&quot;12345&quot;</span><span class="p">.</span><span class="n">parse</span><span class="o">::&lt;</span><span class="kt">u32</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nb">Err</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">panic</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Unable to parse integer&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">};</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">num</span><span class="p">,</span><span class="w"> </span><span class="mi">12345</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在本例中， <code class="docutils literal"><span class="pre">&quot;12345&quot;.parse::&lt;u32&gt;()</span></code> 使用泛型的語法指定解析字串的類別。</p>
+</div>
+<div class="section" id="id3">
+<h2>撰寫泛型程式<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>泛型程式可以用在函式或是物件的撰寫，在本節中，我們分別以泛型函式和泛型物件展示如何撰寫泛型程式。</p>
+<div class="section" id="id4">
+<h3>泛型函式<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>泛型函式的 Rust 虛擬碼如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">foo</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>如果有兩個以上同型別參數，則 Rust 虛擬碼如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">bar</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>如果有兩個以上不同型別的參數，則 Rust 虛擬碼如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">baz</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">U</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">:</span><span class="w"> </span><span class="n">U</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>以下是一個泛型函式的例子，為了簡化程式，我們引用 <code class="docutils literal"><span class="pre">Num</span></code> trait，這個 trait 代表該泛型變數為數字。</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// For a trait of general number</span>
+<span class="k">extern</span><span class="w"> </span><span class="k">crate</span><span class="w"> </span><span class="n">num</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">add</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="n">num</span><span class="o">::</span><span class="n">Num</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id5">
+<h3>泛型物件<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>泛型物件的 Rust 虛擬碼如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="n">Foo</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">y</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>如果需要實作某個物件的方法，Rust 虛擬碼如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Foo</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="k">fn</span><span class="w"> </span><span class="n">do_something</span><span class="p">(</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">       </span><span class="c1">// Implement method here</span>
+<span class="w">   </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>如果要實作某個 trait 也可以：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// Say that Bar is a trait</span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Bar</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Foo</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="n">method_from_bar</span><span class="p">(</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Implement method here</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>以下是一個泛型物件的實例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="kn">use</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">fmt</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="n">Point</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="nb">Copy</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">y</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Point</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="nb">Copy</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">new</span><span class="p">(</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">:</span><span class="w"> </span><span class="n">T</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Point</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">Point</span><span class="o">::&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{</span><span class="w"> </span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">:</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Point</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="nb">Copy</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">x</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Point</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="nb">Copy</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">y</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">y</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Point</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="nb">Copy</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="n">fmt</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Formatter</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="nb">Result</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">write</span><span class="o">!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;({}, {})&quot;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">x</span><span class="p">(),</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">y</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Point</span><span class="o">::&lt;</span><span class="kt">i32</span><span class="o">&gt;::</span><span class="n">new</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">p1</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Point</span><span class="o">::&lt;</span><span class="kt">f64</span><span class="o">&gt;::</span><span class="n">new</span><span class="p">(</span><span class="mf">2.4</span><span class="p">,</span><span class="w"> </span><span class="mf">3.6</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>實際撰寫泛型程式時，設定相關的 trait 相當重要，Rust 需要足夠的資訊來判斷泛型中的變數是否能夠執行特定的行為，而這個資訊是透過 trait 來指定。</p>
+</div>
+</div>
+<div class="section" id="id6">
+<h2>實例：實作向量運算<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>接下來，我們用一個比較長的例子展示如何實作泛型程式。在我們這個例子中，我們實作向量類別，這個類別可以進行向量運算；為了簡化範例，我們僅實作向量加法。首先，建立 <code class="docutils literal"><span class="pre">Vector</span></code> 類別，內部使用 Rust 內建的 vector 來儲存資料，在這裡一併呼叫相關的 trait：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// For a trait of general number</span>
+<span class="k">extern</span><span class="w"> </span><span class="k">crate</span><span class="w"> </span><span class="n">num</span><span class="p">;</span><span class="w"></span>
+
+<span class="kn">use</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">fmt</span><span class="p">;</span><span class="w"></span>
+<span class="kn">use</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">ops</span><span class="o">::</span><span class="n">Add</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="nb">Copy</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">num</span><span class="o">::</span><span class="n">Num</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="n">vec</span><span class="o">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>接著，實作 <code class="docutils literal"><span class="pre">Clone</span></code> trait，使得本向量類別可以像基礎型別般，在計算時拷貝向量，由於 Rust 的限制，目前不能實作 <code class="docutils literal"><span class="pre">Copy</span></code> trait。</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// Currently, Copy trait cannot be implemented</span>
+<span class="c1">// impl&lt;T&gt; Copy for Vector&lt;T&gt; {}</span>
+
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nb">Clone</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="nb">Copy</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">num</span><span class="o">::</span><span class="n">Num</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="k">fn</span><span class="w"> </span><span class="n">clone</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">         </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="o">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Vec</span><span class="o">::</span><span class="n">new</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">         </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="p">..(</span><span class="bp">self</span><span class="p">.</span><span class="n">vec</span><span class="p">.</span><span class="n">len</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">             </span><span class="n">vec</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="w">         </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">         </span><span class="n">Vector</span><span class="o">::&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{</span><span class="w"> </span><span class="n">vec</span><span class="o">:</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">     </span><span class="p">}</span><span class="w"></span>
+<span class="w"> </span><span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>我們的建構子可接受 slice，簡化建立物件的流程：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// Constructor</span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="nb">Copy</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">num</span><span class="o">::</span><span class="n">Num</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">from_slice</span><span class="p">(</span><span class="n">v</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="p">[</span><span class="n">T</span><span class="p">])</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="o">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Vec</span><span class="o">::</span><span class="n">new</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="p">..(</span><span class="n">v</span><span class="p">.</span><span class="n">len</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">             </span><span class="n">vec</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">Vector</span><span class="o">::&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">{</span><span class="w"> </span><span class="n">vec</span><span class="o">:</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>實作 <code class="docutils literal"><span class="pre">fmt::Debug</span></code> trait，之後可直接從 console 印出本類別的內容。這裡實作的方式參考Rust 的 vector 在終端機印出的形式。</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// Overloaded debug string</span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Debug</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="nb">Copy</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">num</span><span class="o">::</span><span class="n">Num</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="n">fmt</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="o">:&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Formatter</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="nb">Result</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span><span class="o">::</span><span class="n">new</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">s</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s">&quot;[&quot;</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="p">..(</span><span class="bp">self</span><span class="p">.</span><span class="n">vec</span><span class="p">.</span><span class="n">len</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">s</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">format</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">vec</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">s</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s">&quot;, &quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">s</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s">&quot;]&quot;</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// Write string to formatter</span>
+<span class="w">        </span><span class="n">write</span><span class="o">!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>實作加法運算子，需實作 <code class="docutils literal"><span class="pre">std::ops::Add</span></code> trait。向量加法的方式是兩向量間同位置元素相加，相加前應檢查兩向量是否等長。</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// Overloaded binary &#39;+&#39; operator</span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Add</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="nb">Copy</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">num</span><span class="o">::</span><span class="n">Num</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="n">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">:</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">other</span><span class="o">:</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">vec</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">vec</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">panic</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;The length of the two vectors are unequal&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">v</span><span class="o">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Vec</span><span class="o">::</span><span class="n">new</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="p">..(</span><span class="bp">self</span><span class="p">.</span><span class="n">vec</span><span class="p">.</span><span class="n">len</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">v</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">Vector</span><span class="p">{</span><span class="w"> </span><span class="n">vec</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>最後，從外部程式呼叫此類別：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">vec1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Vector</span><span class="o">::&lt;</span><span class="kt">i32</span><span class="o">&gt;::</span><span class="n">from_slice</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">vec2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Vector</span><span class="o">::&lt;</span><span class="kt">i32</span><span class="o">&gt;::</span><span class="n">from_slice</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v2</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// We have to explictly clone our Vector object at present.</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">vec3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec1</span><span class="p">.</span><span class="n">clone</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">vec2</span><span class="p">.</span><span class="n">clone</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{:?}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{:?}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec2</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{:?}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec3</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>若我們將這個範例繼續發展下去，就可以實作具有泛型機制的向量運算類別，有興趣的讀者可以自行嘗試。由於 Rust 為了保持函式庫的相容性，現階段不允許對 non-Copy data 實作 Copy trait，像是本例的向量類別內部使用的 vector，所以，我們必需要在外部程式中明確地拷貝向量類別。經筆者實測，對於有解構子的類別也不能使用 Copy trait，所以，即使我們用 C 風格的陣列重新實作 vector，同樣也不能用 Copy trait。</p>
+<p>另外，我們在這裡用了一個外部函式庫提供 <code class="docutils literal"><span class="pre">Num</span></code> trait，這個 trait 代表該型別符合數字，透過使用這個 trait，不需要重新實作代表數字的 trait，簡化我們的程式。</p>
+<p>剛開始寫 Rust 泛型程式時，會遭到許多錯誤而無法順利編譯，讓初學者感到挫折。解決這個問題的關鍵在於 Rust 的 trait 系統。撰寫泛型程式時，若沒有對泛型變數 <code class="docutils literal"><span class="pre">T</span></code> 加上任何的 trait 限制，Rust 沒有足夠的資訊是否能對 <code class="docutils literal"><span class="pre">T</span></code> 呼叫相對應的內建 trait，因而引發錯誤訊息。即使是使用運算子，Rust 也會呼叫相對應的 trait；因此，熟悉 trait 的運作，對撰寫泛型程式有相當的幫助。</p>
+</div>
+<div class="section" id="id7">
+<h2>(案例選讀) 模擬方法重載<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<p>Rust 不支援方法重載，不過，可以利用泛型加上多型達到類似的效果。由於呼叫泛型函式時，不需要明確指定參數的型別，使得外部程式在呼叫該函式時，看起來像是方法重載般。接下來，我們以一個範例來展示如何模擬方法重載。首先，定義公開的 trait：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="kn">use</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">fmt</span><span class="p">;</span><span class="w"></span>
+
+<span class="c1">// An holder for arbitrary type</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">Data</span><span class="o">:</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="c1">// Omit interface</span>
+<span class="w">     </span><span class="c1">// You may declare more methods later.</span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">IntoData</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="k">type</span><span class="w"> </span><span class="n">OutData</span><span class="o">:</span><span class="w"> </span><span class="n">Data</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">     </span><span class="k">fn</span><span class="w"> </span><span class="n">into_data</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Self</span><span class="o">::</span><span class="n">OutData</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>接著，實作 <code class="docutils literal"><span class="pre">Reader</span></code> 類別，在這個類別中，實作了一個泛型函式，搭配先前的 trait 類別來模擬方法重載。</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="n">Reader</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
+
+<span class="c1">// Use generic method to mimic functional overloading</span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Reader</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">get_data</span><span class="o">&lt;</span><span class="n">I</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="o">:</span><span class="w"> </span><span class="n">I</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="n">Data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"></span>
+<span class="w">     </span><span class="n">where</span><span class="w"> </span><span class="n">I</span><span class="o">:</span><span class="w"> </span><span class="n">IntoData</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="na">&#39;a</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">         </span><span class="nb">Box</span><span class="o">::</span><span class="n">new</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">into_data</span><span class="p">())</span><span class="w"></span>
+<span class="w">     </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>接著，實作 <code class="docutils literal"><span class="pre">StrData</span></code> 類別，這個類別會實作 <code class="docutils literal"><span class="pre">Data</span></code> 和 <code class="docutils literal"><span class="pre">IntoData</span></code> 這兩個 trait，以滿足前述介面所定義的行為。</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="n">StrData</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="kt">str</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="n">StrData</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">new</span><span class="p">(</span><span class="n">s</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">StrData</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">         </span><span class="n">StrData</span><span class="p">{</span><span class="w"> </span><span class="kt">str</span><span class="o">:</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">StrData</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="n">fmt</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Formatter</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="nb">Result</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="n">write</span><span class="o">!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="kt">str</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Data</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">StrData</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Omit implementation</span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="n">IntoData</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">StrData</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="n">OutData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="n">into_data</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">         </span><span class="bp">self</span><span class="p">.</span><span class="kt">str</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="cm">/* Even Data trait is empty, it is necessary to</span>
+<span class="cm">   explictly implement it. */</span><span class="w"></span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Data</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="o">&amp;</span><span class="na">&#39;a</span><span class="w"> </span><span class="kt">str</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Omit implementation</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>接著，以類似 <code class="docutils literal"><span class="pre">StrData</span></code> 的方式實作 <code class="docutils literal"><span class="pre">IntData</span></code>：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="n">IntData</span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">int</span><span class="o">:</span><span class="w"> </span><span class="kt">i32</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">IntData</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">new</span><span class="p">(</span><span class="n">i</span><span class="o">:</span><span class="w"> </span><span class="kt">i32</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">IntData</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">IntData</span><span class="p">{</span><span class="w"> </span><span class="n">int</span><span class="o">:</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Display</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">IntData</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="n">fmt</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="n">Formatter</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fmt</span><span class="o">::</span><span class="nb">Result</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">write</span><span class="o">!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">int</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">Data</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">IntData</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Omit implementation</span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">IntoData</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">IntData</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="k">type</span><span class="w"> </span><span class="n">OutData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">i32</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">     </span><span class="k">fn</span><span class="w"> </span><span class="n">into_data</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">         </span><span class="bp">self</span><span class="p">.</span><span class="n">int</span><span class="w"></span>
+<span class="w">     </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="cm">/* Even Data trait is empty, it is necessary to</span>
+<span class="cm">   explictly implement it. */</span><span class="w"></span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="na">&#39;a</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Data</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="c1">// Omit implementation</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>最後，從外部程式呼叫：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">reader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Reader</span><span class="p">{};</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">str_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">StrData</span><span class="o">::</span><span class="n">new</span><span class="p">(</span><span class="s">&quot;string data&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">int_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IntData</span><span class="o">::</span><span class="n">new</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Call hidden generic method to minic functional overloading</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="kt">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">str_data</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">int</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">int_data</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Data from StrData: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">str</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Data form IntData: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">int</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在我們這個範例中，除了用泛型的機制模擬出方法重載以外，另外一個重點在於 <code class="docutils literal"><span class="pre">get_data</span></code> 函式隱藏了一些內部的操作，對於程式設計者來說，只要實作 <code class="docutils literal"><span class="pre">Data</span></code> 和 <code class="docutils literal"><span class="pre">IntoData</span></code> 後，從外部程式呼叫時，不需要在意其中操作的細節，這也是物件導向的優點之一。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="fp.html" title="函數式程式設計"
+             >next</a></li>
+        <li class="right" >
+          <a href="oop.html" title="物件導向程式設計"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rust 程式設計從頭開始 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; <a href="../copyright.html">Copyright</a> Michael Chen, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

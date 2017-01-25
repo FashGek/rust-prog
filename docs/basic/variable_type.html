@@ -1,0 +1,425 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-TW">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>變數和型別 &#8212; Rust 程式設計從頭開始 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="運算子" href="operator.html" />
+    <link rel="prev" title="準備工作" href="prior_work.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="operator.html" title="運算子"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="prior_work.html" title="準備工作"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rust 程式設計從頭開始 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">變數和型別</a><ul>
+<li><a class="reference internal" href="#hello-world">再訪 Hello World</a></li>
+<li><a class="reference internal" href="#id2">註解</a></li>
+<li><a class="reference internal" href="#id3">關鍵字</a></li>
+<li><a class="reference internal" href="#id4">變數</a><ul>
+<li><a class="reference internal" href="#id5">使用變數</a></li>
+<li><a class="reference internal" href="#id6">變數名稱</a></li>
+<li><a class="reference internal" href="#id7">變數的可變性</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id8">型別</a><ul>
+<li><a class="reference internal" href="#id9">基礎型別</a></li>
+<li><a class="reference internal" href="#id10">布林</a></li>
+<li><a class="reference internal" href="#id11">字元</a></li>
+<li><a class="reference internal" href="#id12">字串</a></li>
+<li><a class="reference internal" href="#id13">數字</a></li>
+<li><a class="reference internal" href="#slice-tuple">陣列、slice 和 tuple</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="prior_work.html"
+                        title="previous chapter">準備工作</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="operator.html"
+                        title="next chapter">運算子</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/basic/variable_type.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>變數和型別<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>在本章，我們介紹 Rust 程式的基本概念，包括 Rust 程式的組成、變數和型別。前幾章的程式，大部分都很簡單，但仍建議讀者實際練習一次；即使只是看著書照著打一次，都會有一些些幫助，因為 (1) 藉由這個過程熟悉建立 Rust 程式的過程，(2) 對於一些初階的錯誤，像是忘了加分號或打錯函式名稱，藉由實際練習才會改善。透過閱讀得到知識的過程很快，但也很容易遺忘，透過肌肉操作得到知識的過程較慢，然而，一旦學會，記憶可維持較久。</p>
+<div class="section" id="hello-world">
+<h2>再訪 Hello World<a class="headerlink" href="#hello-world" title="Permalink to this headline">¶</a></h2>
+<p>我們重新檢視 Hello World 範例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Hello, World&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>這個程式，分為兩個部分，一個是 <code class="docutils literal"><span class="pre">main</span></code> <strong>函式 (function)</strong>，一個是 <code class="docutils literal"><span class="pre">println!(&quot;Hello,</span> <span class="pre">World&quot;);</span></code> <strong>敘述 (statement)</strong>。函式是一種程式碼再利用的方式，將程式碼組織成函式，可重覆呼叫，避免撰寫重覆的程式碼。<code class="docutils literal"><span class="pre">main</span></code> 函式是一個特殊的函式，每個 Rust 主程式都會有一個 <code class="docutils literal"><span class="pre">main</span></code> 函式，而且也只能有一個 <code class="docutils literal"><span class="pre">main</span></code> 函式。這個函式是程式的進入點。<code class="docutils literal"><span class="pre">main</span></code> 函式固定的形式如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>現階段，我們不需要在意函式的其他相關細節，只要記得程式碼要寫在 <code class="docutils literal"><span class="pre">main()</span></code> 函式中即可。</p>
+<p><code class="docutils literal"><span class="pre">println!</span></code> 是一個<strong>巨集 (macro)</strong>，其作用為在終端機 (console) 印出字串及附加換行 (newline) 符號。在我們的範例中，<code class="docutils literal"><span class="pre">println!(&quot;Hello,</span> <span class="pre">World&quot;)</span></code> 就會印出 <em>Hello, World</em> 字串。巨集是一種特殊的函式，在 Rust，巨集會用驚嘆號 <code class="docutils literal"><span class="pre">!</span></code> 和一般的函式區別開來。現階段，我們不需要了解巨集的細節，就當成現有的函式即可。</p>
+<p><code class="docutils literal"><span class="pre">println!(&quot;Hello,</span> <span class="pre">World&quot;);</span></code> 是一條敘述。程式由許多敘述組成，每條敘述的最後面會加上分號 <code class="docutils literal"><span class="pre">;</span></code>。在預設情形下，程式會由上往下，依序執行敘述。見以下範例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Hello, Rustacean.&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Welcome to Rust Programming.&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在本程式中，有兩條敘述，而本程式會由上往下依序印出 <em>Hello, Rustacean.</em> 和 <em>Welcome to Rust Programming.</em> 這兩行字串。</p>
+</div>
+<div class="section" id="id2">
+<h2>註解<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>在撰寫程式時，<strong>註解 (comment)</strong> 是給程式設計者看的，不會影響程式的運行。Rust 有三種註解，分別為：</p>
+<ul class="simple">
+<li>單行註解 (line comments)：以 <code class="docutils literal"><span class="pre">//</span></code> 開頭，之後該行文字皆視為註解</li>
+<li>多行註解 (block comments)：以一對 <code class="docutils literal"><span class="pre">/*</span></code> 和 <code class="docutils literal"><span class="pre">*/</span></code> 包起來，可跨越多行</li>
+<li>文件註解 (doc comments) 以 <code class="docutils literal"><span class="pre">///</span></code> 開頭，製作程式說明文件時使用</li>
+</ul>
+<p>以下為範例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="cm">/* main function is program entry point.</span>
+<span class="cm">   Each binary should contain one and</span>
+<span class="cm">   only one main function. */</span><span class="w"></span>
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Print out the string Hello World in console.</span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Hello, World&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>雖然程式碼本身就足以說明程式運作的過程，良好的註解可使得閱讀程式碼更有效率。本書會加入少量的註解以說明程式的運作。</p>
+</div>
+<div class="section" id="id3">
+<h2>關鍵字<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>每個程式語言都會有自己的關鍵字 (keyword)，關鍵字在程式碼中被賦予特殊的意義，不能作為其他用途，像是 <code class="docutils literal"><span class="pre">fn</span></code> 表示定義一個函式。以下是 Rust 的關鍵字：</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>abstract alignof  as       become
+box      break    const    continue
+crate    do       else     enum
+extern   false    final    fn
+for      if       impl     in
+let      loop     macro    match
+mod      move     mut      offsetof
+override priv     proc     pub
+pure     ref      return   Self
+self     sizeof   static   struct
+super    trait    true     type
+typeof   unsafe   unsized  use
+virtual  where    while    yield
+</pre></div>
+</div>
+<p>讀者不需要去背誦關鍵字，筆者在學習程式設計的過程中，也不會刻意去記憶關鍵字。因為 (1) 編輯器或 IDE 會用顏色提示使用者那些部分是關鍵字 (2) 持續使用某個語言一段時間後，就會自然記住 (3) 忘記時再查閱即可，像是每個程式語言的 <code class="docutils literal"><span class="pre">else</span> <span class="pre">if</span></code> 的寫法都略有不同，過一陣子沒用就忘了，也不需要刻意去記。</p>
+</div>
+<div class="section" id="id4">
+<h2>變數<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h3>使用變數<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>在程式語言中，<strong>變數 (variable)</strong> 的作用在於連結資料 (data)，在後續的程式碼中可再使用。見以下範例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Michael&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Hello, {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在以上程式中，我們定義了變數 <code class="docutils literal"><span class="pre">name</span></code>，其值為字串 <em>Michael</em>，接著，我們將此變數傳入 <code class="docutils literal"><span class="pre">println!</span></code> 函式中印出。<code class="docutils literal"><span class="pre">&quot;Hello,</span> <span class="pre">{}&quot;</span></code> 的寫法是<strong>字串安插 (string interpolation)</strong>，會在後面接續變數或資料。<code class="docutils literal"><span class="pre">let</span></code> 是 Rust 的關鍵字，其作用為定義變數。</p>
+<p>我們再看另一個範例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">greeting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Goodbye&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Michael&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{}, {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">greeting</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在這個程式中，我們安插兩個變數進入 <code class="docutils literal"><span class="pre">println!</span></code> 函式中，結果會印出 <em>Goodbye, Michael</em> 字串。</p>
+<p>如果變數沒有值，會發生什麼事呢？見以下範例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;x = {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>這個程式會引發下列錯誤：</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">error[E0282]: unable to infer enough type information about `_`</span>
+</pre></div>
+</div>
+<p>這裡隱含著兩個概念，首先，變數要有相對應的值，否則會引發錯誤，再來，就是<strong>型別 (type)</strong> 的觀念。程式語言的意義在於操作資料 (data)，大部分的程式語言會將資料分類到不同的型別，Rust 也有許多的型別，我們後續會提到型別的相關概念。但是，即使我們加上型別的資訊，若沒有指定值，仍然會引發錯誤。見以下範例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="kt">i32</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;x = {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>這時候，引發了另一個錯誤：</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">error[E0381]: use of possibly uninitialized variable: `x`</span>
+</pre></div>
+</div>
+<p>這個錯誤告訴我們變數 <code class="docutils literal"><span class="pre">x</span></code> 未初始化，即未指定值。我們再改寫一下程式：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;x = {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>這次程式可正確地執行。雖然我們沒有在程式中明確指定 <code class="docutils literal"><span class="pre">x</span></code> 的型別，Rust 可由 <code class="docutils literal"><span class="pre">3</span></code> 得知 <code class="docutils literal"><span class="pre">x</span></code> 為 <code class="docutils literal"><span class="pre">i32</span></code> (32 位元整數) 型別。這是由於 Rust 提供<strong>型別推斷 (type inference)</strong> 的功能，使得程式撰寫起在像 Python 等高階語言。</p>
+</div>
+<div class="section" id="id6">
+<h3>變數名稱<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>目前 Rust 的變數名稱採用以下規則：</p>
+<ul class="simple">
+<li>第一個字元為英文或底線 <cite>_</cite></li>
+<li>第二個之後的字元為英文、數字或底線</li>
+<li>只有單一的底線 <cite>_</cite> 不是變數</li>
+</ul>
+<p>以下是合 Rust 規範的變數名稱：</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">x</span></code></li>
+<li><code class="docutils literal"><span class="pre">x1</span></code></li>
+<li><code class="docutils literal"><span class="pre">a_long_variable</span></code></li>
+<li><code class="docutils literal"><span class="pre">aLongVariable</span></code></li>
+<li><code class="docutils literal"><span class="pre">_var</span></code></li>
+</ul>
+<p>對於較長的變數名稱，Rust 建議 snake case (像是 a_long_variable) 而非 camel case (像是 aLongVariable)。Rust 會對不符合其撰碼風格的變數或函式名稱發出警告訊息，但不會引發錯誤。雖然 Rust 支援 Unicode，但目前只能用英文字母來命名變數 (見 Rust <a class="reference external" href="https://github.com/rust-lang/rust/issues/28979">issue #28979</a>)。</p>
+</div>
+<div class="section" id="id7">
+<h3>變數的可變性<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>以下程式看似正常：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">  </span><span class="c1">// Error</span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;x = {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>但卻引發了下列錯誤：</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">error[E0384]: re-assignment of immutable variable `x`</span>
+</pre></div>
+</div>
+<p>Rust 和許多程式語言不同，在預設情形下，變數一旦賦值後就不能改變。然而，改變變數狀態是程式設計常見的功能，要如何處理呢？Rust 要求程式設計者必需明確指出某個變數是可變的 (mutable)。使用較安全的規範，是 Rust 的特色，程式設計者要試著去適應 Rust 的思維。</p>
+<p>我們將程式改寫如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;x = {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>這次程式即可正確執行。我們在程式中使用 <code class="docutils literal"><span class="pre">mut</span></code> 這個關鍵字使 Rust 知道我們的變數 <code class="docutils literal"><span class="pre">x</span></code> 是可變的。</p>
+</div>
+</div>
+<div class="section" id="id8">
+<h2>型別<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<p>我們在前面的程式中，使用了 Rust 的變數宣告，卻沒有明確指定 Rust 的<strong>型別 (type)</strong>。Rust 就像大部分的程式語言，有許多的型別。在程式設計中，資料型別規範該資料在程式中允許的操作，像是數字可以加、減、乘、除，字串可以相接等。Rust 定義了數個<strong>基礎型別 (primitive types)</strong>，程式設計者可以直接對這些型別的資料進行 Rust 所定義的操作。除此之外，使用者也可以新增新的型別和其相關的操作。如果 Rust 可正確推斷型別時，不需明確給定型別，但有時仍要明確給定型別，故仍然要有型別的概念。</p>
+<div class="section" id="id9">
+<h3>基礎型別<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>Rust 在內建語法中包括以下基礎型別：</p>
+<ul class="simple">
+<li>布林 <code class="docutils literal"><span class="pre">bool</span></code></li>
+<li>字元 <code class="docutils literal"><span class="pre">char</span></code></li>
+<li>字串 <code class="docutils literal"><span class="pre">str</span></code></li>
+<li>數字<ul>
+<li>整數<ul>
+<li>有號固定整數：包括 <code class="docutils literal"><span class="pre">i8</span></code>、<code class="docutils literal"><span class="pre">i16</span></code>、<code class="docutils literal"><span class="pre">i32</span></code>、<code class="docutils literal"><span class="pre">i64</span></code> 等</li>
+<li>無號固定整數：包括 <code class="docutils literal"><span class="pre">u8</span></code>、<code class="docutils literal"><span class="pre">u16</span></code>、<code class="docutils literal"><span class="pre">u32</span></code>、<code class="docutils literal"><span class="pre">u64</span></code> 等</li>
+<li>變動整數：包括 <code class="docutils literal"><span class="pre">isize</span></code> 和 <code class="docutils literal"><span class="pre">usize</span></code> 等</li>
+</ul>
+</li>
+<li>浮點數：包括 <code class="docutils literal"><span class="pre">f32</span></code> 和 <code class="docutils literal"><span class="pre">f64</span></code> 等</li>
+</ul>
+</li>
+<li>陣列</li>
+<li>Slice</li>
+<li>Tuple</li>
+</ul>
+</div>
+<div class="section" id="id10">
+<h3>布林<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>Rust 內建布林 (boolean) 值，包括 <code class="docutils literal"><span class="pre">true</span></code> 和 <code class="docutils literal"><span class="pre">false</span></code> 兩種值。布林主要用於<strong>條件句 (conditional)</strong>，後續的章節會說明。</p>
+</div>
+<div class="section" id="id11">
+<h3>字元<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>字元代表單一的 Unicode scalar value，字元以一對單引號 <code class="docutils literal"><span class="pre">'</span></code> 括起來。</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;x&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id12">
+<h3>字串<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>Rust 中有兩種字串型別，一種是 String 類別，一種是 <code class="docutils literal"><span class="pre">str</span></code>。我們將於後續章節介紹字串的使用。</p>
+</div>
+<div class="section" id="id13">
+<h3>數字<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>Rust 有數種數字型別，主要可分為：</p>
+<ul class="simple">
+<li>有號 (signed) 及無號 (unsigned)</li>
+<li>固定 (fixed) 和變動 (variable)</li>
+<li>整數 (integer) 和浮點數 (floating point number)</li>
+</ul>
+<p>有號和無號整數的差別在於是否有帶正負號，這會影響該數字的最小值和最大值。例如，<code class="docutils literal"><span class="pre">i8</span></code> 的最小值為 -128，最大值為 127，而 <code class="docutils literal"><span class="pre">u8</span></code> 的最小值為 0，最大值為 255。固定整數有一定的位元數，而變動整數的位元數會因平台而有所不同。浮點數有兩種，分別對應 IEEE-754 單精確度和雙精確度浮點數。</p>
+<p>以下程式列出 Rust 的每個數字型別的最小值和最大值，讀者可自行在自己的電腦上嘗試。</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// Call related modules in standard library</span>
+<span class="kn">use</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="p">{</span><span class="kt">i8</span><span class="p">,</span><span class="w"> </span><span class="kt">i16</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="p">,</span><span class="w"> </span><span class="kt">isize</span><span class="p">};</span><span class="w"></span>
+<span class="kn">use</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="p">{</span><span class="kt">u8</span><span class="p">,</span><span class="w"> </span><span class="kt">u16</span><span class="p">,</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span><span class="w"> </span><span class="kt">usize</span><span class="p">};</span><span class="w"></span>
+<span class="kn">use</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="p">{</span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="kt">f64</span><span class="p">};</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// signed, fixed-width integers</span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;i8 min: {}, max: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">i8</span><span class="o">::</span><span class="n">min_value</span><span class="p">(),</span><span class="w"> </span><span class="kt">i8</span><span class="o">::</span><span class="n">max_value</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;i16 min: {}, max: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">i16</span><span class="o">::</span><span class="n">min_value</span><span class="p">(),</span><span class="w"> </span><span class="kt">i16</span><span class="o">::</span><span class="n">max_value</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;i32 min: {}, max: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="o">::</span><span class="n">min_value</span><span class="p">(),</span><span class="w"> </span><span class="kt">i32</span><span class="o">::</span><span class="n">max_value</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;i64 min: {}, max: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="o">::</span><span class="n">min_value</span><span class="p">(),</span><span class="w"> </span><span class="kt">i64</span><span class="o">::</span><span class="n">max_value</span><span class="p">());</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// unsigned, fixed-width integers</span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;u8 min: {}, max: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">u8</span><span class="o">::</span><span class="n">min_value</span><span class="p">(),</span><span class="w"> </span><span class="kt">u8</span><span class="o">::</span><span class="n">max_value</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;u16 min: {}, max: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">u16</span><span class="o">::</span><span class="n">min_value</span><span class="p">(),</span><span class="w"> </span><span class="kt">u16</span><span class="o">::</span><span class="n">max_value</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;u32 min: {}, max: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">u32</span><span class="o">::</span><span class="n">min_value</span><span class="p">(),</span><span class="w"> </span><span class="kt">u32</span><span class="o">::</span><span class="n">max_value</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;u64 min: {}, max: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">u64</span><span class="o">::</span><span class="n">min_value</span><span class="p">(),</span><span class="w"> </span><span class="kt">u64</span><span class="o">::</span><span class="n">max_value</span><span class="p">());</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// variable-width integers (platform dependant)</span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;isize min: {}, max: {}&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="kt">isize</span><span class="o">::</span><span class="n">min_value</span><span class="p">(),</span><span class="w"></span>
+<span class="w">             </span><span class="kt">isize</span><span class="o">::</span><span class="n">max_value</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;usize min: {}, max: {}&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="kt">usize</span><span class="o">::</span><span class="n">min_value</span><span class="p">(),</span><span class="w"></span>
+<span class="w">             </span><span class="kt">usize</span><span class="o">::</span><span class="n">max_value</span><span class="p">());</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// floating point numbers</span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;f32 min: {}, max: {}, min positive: {}&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="kt">f32</span><span class="o">::</span><span class="n">MIN</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="kt">f32</span><span class="o">::</span><span class="n">MAX</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="kt">f32</span><span class="o">::</span><span class="n">MIN_POSITIVE</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;f64 min: {}, max: {}, min positive: {}&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="kt">f64</span><span class="o">::</span><span class="n">MIN</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="kt">f64</span><span class="o">::</span><span class="n">MAX</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="kt">f64</span><span class="o">::</span><span class="n">MIN_POSITIVE</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p><strong>溢位 (overflow)</strong> 是程式在運算時，超過該型別的最大值；而<strong>下溢 (underflow)</strong> 則是程式在運算時，小於該數字型別的最小值。在 Rust 中，溢位或下溢會引發錯誤，這是較安全的設計。例如，以下程式引發溢位：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="kn">use</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="kt">i32</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">n</span><span class="o">:</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">i32</span><span class="o">::</span><span class="n">max_value</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">  </span><span class="c1">// Overflow</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>顯示以下錯誤訊息：</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">thread &#39;main&#39; panicked at &#39;attempt to add with overflow&#39;</span>
+</pre></div>
+</div>
+<p>如果要計算的數字較大，需使用大數運算相關套件，如下例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// Call third-party package</span>
+<span class="k">extern</span><span class="w"> </span><span class="k">crate</span><span class="w"> </span><span class="n">num</span><span class="p">;</span><span class="w"></span>
+
+<span class="kn">use</span><span class="w"> </span><span class="n">num</span><span class="o">::</span><span class="n">bigint</span><span class="o">::</span><span class="n">ToBigInt</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.</span><span class="n">to_bigint</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">num</span><span class="o">::</span><span class="n">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>若讀者想實際執行本程式，需在 <em>Cargo.toml</em> 中加入外部套件，如下：</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>[dependencies]
+num = &quot;0.1&quot;
+</pre></div>
+</div>
+</div>
+<div class="section" id="slice-tuple">
+<h3>陣列、slice 和 tuple<a class="headerlink" href="#slice-tuple" title="Permalink to this headline">¶</a></h3>
+<p>這些為<strong>容器 (container)</strong>，將於後續章節中介紹。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="operator.html" title="運算子"
+             >next</a></li>
+        <li class="right" >
+          <a href="prior_work.html" title="準備工作"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rust 程式設計從頭開始 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; <a href="../copyright.html">Copyright</a> Michael Chen, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

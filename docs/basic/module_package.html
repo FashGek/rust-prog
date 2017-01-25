@@ -1,0 +1,340 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-TW">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>模組和套件 &#8212; Rust 程式設計從頭開始 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="字串" href="string.html" />
+    <link rel="prev" title="函式" href="function.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="string.html" title="字串"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="function.html" title="函式"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rust 程式設計從頭開始 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">模組和套件</a><ul>
+<li><a class="reference internal" href="#id2">使用模組</a></li>
+<li><a class="reference internal" href="#id3">撰寫模組</a></li>
+<li><a class="reference internal" href="#id4">建立套件</a></li>
+<li><a class="reference internal" href="#id6">在套件中使用模組</a></li>
+<li><a class="reference internal" href="#id7">進階的模組使用方式</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="function.html"
+                        title="previous chapter">函式</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="string.html"
+                        title="next chapter">字串</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/basic/module_package.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>模組和套件<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>我們學會函式後，程式碼可以分離，然而，隨著專案規模上升，函式名稱有可能相互衝突。雖然，我們也可以修改函式名稱，但是，只靠函數名稱來區分函式，往往會造成函數名稱變得冗長。像 C 語言中，沒有額外的機制處理函式名稱的衝突，就會看到很多長名稱的函式，像是 <code class="docutils literal"><span class="pre">gtk_application_get_windows</span></code> (出自 GTK+ 函式庫)。Rust 提供<strong>模組 (module)</strong> 的機制，處理函式命名衝突的問題。</p>
+<p><em>註：在許多程式語言中，以命名空間 (namespace) 提供類似的機制。</em></p>
+<p>在我們先前的內容中，函式和主程式都寫在同一個檔案。在實務上，我們會將函式或物件獨立出來，製成<strong>套件 (package)</strong>，之後可以重覆利用。例如，同一套函式庫，可供終端機或圖形介面等不同使用者介面來使用。在 Rust 中，套件和模組相互關連。Rust 的套件又稱為 <strong>crate</strong>。</p>
+<div class="section" id="id2">
+<h2>使用模組<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>雖然我們在先前的內容沒有強調模組，實際上，我們已經在使用模組了。我們回頭看先前的一個例子：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// Call f64 module from std library</span>
+<span class="kn">use</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="kt">f64</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Call sqrt function</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">f64</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在這個例子中，我們呼叫 <code class="docutils literal"><span class="pre">std</span></code> 函式庫之中的 <code class="docutils literal"><span class="pre">f64</span></code> 模組，之後，就可以呼叫該模組內的 <code class="docutils literal"><span class="pre">sqrt</span></code> 函式。</p>
+</div>
+<div class="section" id="id3">
+<h2>撰寫模組<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>在 Rust 中，使用 <code class="docutils literal"><span class="pre">mod</span></code> 這個關鍵字來建立模組。如下例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="kn">mod</span><span class="w"> </span><span class="n">english</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">hello</span><span class="p">(</span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Hello, {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kn">mod</span><span class="w"> </span><span class="n">chinese</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">hello</span><span class="p">(</span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;你好，{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Call modules</span>
+<span class="w">    </span><span class="kn">use</span><span class="w"> </span><span class="n">english</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kn">use</span><span class="w"> </span><span class="n">chinese</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Call two functions with the same name</span>
+<span class="w">    </span><span class="n">english</span><span class="o">::</span><span class="n">hello</span><span class="p">(</span><span class="s">&quot;Michael&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">chinese</span><span class="o">::</span><span class="n">hello</span><span class="p">(</span><span class="s">&quot;麥可&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在本例中，我們在兩個模組中定義了同名而不同功能的函式。由於這兩個函式被區隔不同的模組中，不會有命名衝突的問題。模組除了區隔函式名稱外，也提供私有區塊，在模組中的函式或物件，需以 <code class="docutils literal"><span class="pre">pub</span></code> 關鍵字宣告，否則無法在模組外使用。</p>
+<p>如同我們先前看到的範例，模組也可以內嵌。如下例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="kn">mod</span><span class="w"> </span><span class="n">english</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="kn">mod</span><span class="w"> </span><span class="n">greeting</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">hello</span><span class="p">(</span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Hello, {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="kn">mod</span><span class="w"> </span><span class="n">farewell</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">goodbye</span><span class="p">(</span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Goodbye, {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kn">use</span><span class="w"> </span><span class="n">english</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">english</span><span class="o">::</span><span class="n">greeting</span><span class="o">::</span><span class="n">hello</span><span class="p">(</span><span class="s">&quot;Michael&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">english</span><span class="o">::</span><span class="n">farewell</span><span class="o">::</span><span class="n">goodbye</span><span class="p">(</span><span class="s">&quot;Michael&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>由本例可知，透過模組的機制，可以協助我們整理函式。</p>
+</div>
+<div class="section" id="id4">
+<h2>建立套件<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>在我們先前的範例中，我們建立的是主程式專案，如下：</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> cargo new --bin myapp
+</pre></div>
+</div>
+<p>但若想將函式或物件獨立建置，則要用函式庫專案，如下：</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> cargo new --lib mylib
+</pre></div>
+</div>
+<p>我們現在實際建立一個函式庫套件。以上述指令建立 <em>mylib</em> 函式庫套件。加入以下函式：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// mylib/src/lib.rc</span>
+
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">hello</span><span class="p">(</span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nb">String</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">format</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Hello, {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>之後，退回到上一層目錄，建立 <em>myapp</em> 主程式套件。加入以下內容：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// myapp/src/main.rs</span>
+
+<span class="c1">// Call mylib</span>
+<span class="k">extern</span><span class="w"> </span><span class="k">crate</span><span class="w"> </span><span class="n">mylib</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">mylib</span><span class="o">::</span><span class="n">hello</span><span class="p">(</span><span class="s">&quot;Michael&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Hello, Michael&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>透過 <code class="docutils literal"><span class="pre">extern</span> <span class="pre">crate</span></code> 可以呼叫外部專案。另外，要修改 <em>Cargo.toml</em> 紀錄檔，加入以下內容：</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>[dependencies]
+mylib = { path = &quot;../mylib&quot; }
+</pre></div>
+</div>
+<p>之後，執行該專案，若可正確執行，代表我們成功地建立套件。</p>
+<p>如果函式庫存放在遠端站台上，需修改存取位置。在下例中，我們存取以 Git 存放的函式庫：</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>[dependencies]
+rand = { git = &quot;https://github.com/rust-lang-nursery/rand.git&quot; }
+</pre></div>
+</div>
+<p><em>Cargo.toml</em> 是 Rust 套件 (i.e. crate) 使用的設定檔。建議花一些時間熟悉其<a class="reference external" href="http://doc.crates.io/guide.html">官方文件</a>。</p>
+</div>
+<div class="section" id="id6">
+<h2>在套件中使用模組<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>在我們先前的例子中，透過 <em>mylib</em> 函式庫對函式命名做最基本的區隔。不過，我們也可以在函式庫中使用模組來進一步區隔函式。我們先以實例看加入模組後的效果：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// Call external library</span>
+<span class="k">extern</span><span class="w"> </span><span class="k">crate</span><span class="w"> </span><span class="n">phrase</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Hello, Michael&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">phrase</span><span class="o">::</span><span class="n">english</span><span class="o">::</span><span class="n">greeting</span><span class="o">::</span><span class="n">hello</span><span class="p">(</span><span class="s">&quot;Michael&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;你好，麥可&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">phrase</span><span class="o">::</span><span class="n">chinese</span><span class="o">::</span><span class="n">greeting</span><span class="o">::</span><span class="n">hello</span><span class="p">(</span><span class="s">&quot;麥可&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>同樣地，需於 <em>Cargo.toml</em> 加入套件位置：</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>[dependencies]
+phrase = { path = &quot;../phrase&quot; }
+</pre></div>
+</div>
+<p>退回上一層目錄，建立 <em>phrase</em> 函式庫：</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> cargo new --lib phrase
+</pre></div>
+</div>
+<p>整個 <em>phrase</em> 專案結構如下：</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> tree
+<span class="go">.</span>
+<span class="go">├── Cargo.lock</span>
+<span class="go">├── Cargo.toml</span>
+<span class="go">└── src</span>
+<span class="go">    ├── chinese</span>
+<span class="go">    │   ├── greeting.rs</span>
+<span class="go">    │   └── mod.rs</span>
+<span class="go">    ├── english</span>
+<span class="go">    │   ├── greeting.rs</span>
+<span class="go">    │   └── mod.rs</span>
+<span class="go">    └── lib.rs</span>
+</pre></div>
+</div>
+<p>在 <em>src/lib.rs</em> 中宣告模組，記得要宣告公開權限：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="kn">mod</span><span class="w"> </span><span class="n">english</span><span class="p">;</span><span class="w"></span>
+<span class="k">pub</span><span class="w"> </span><span class="kn">mod</span><span class="w"> </span><span class="n">chinese</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在 <em>src/english/mod.rs</em> 中宣告子模組：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="kn">mod</span><span class="w"> </span><span class="n">greeting</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在 <em>src/english/greeting.rs</em> 中實作函式：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">hello</span><span class="p">(</span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nb">String</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">format</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Hello, {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>同樣地，在 <em>src/chinese/mod.rs</em> 中宣告子模組：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="kn">mod</span><span class="w"> </span><span class="n">greeting</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>同樣地，在 <em>src/chinese/greeting.rs</em> 中實作函式：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">hello</span><span class="p">(</span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nb">String</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">format</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;你好，{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>由於 Rust 的模組及套件和檔案名稱是連動的，若使用錯誤的檔案名稱將無法編譯，需注意。</p>
+</div>
+<div class="section" id="id7">
+<h2>進階的模組使用方式<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<p>在先前的例子中，由於函式庫結構較複雜，使得函式呼叫的動作變得繁瑣，Rust 提供語法來簡化這個動作。如下例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">extern</span><span class="w"> </span><span class="k">crate</span><span class="w"> </span><span class="n">phrase</span><span class="p">;</span><span class="w"></span>
+
+<span class="kn">use</span><span class="w"> </span><span class="n">phrase</span><span class="o">::</span><span class="n">english</span><span class="o">::</span><span class="n">greeting</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">en_greeting</span><span class="p">;</span><span class="w"></span>
+<span class="kn">use</span><span class="w"> </span><span class="n">phrase</span><span class="o">::</span><span class="n">chinese</span><span class="o">::</span><span class="n">greeting</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">zh_greeting</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Hello, Michael&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">en_greeting</span><span class="o">::</span><span class="n">hello</span><span class="p">(</span><span class="s">&quot;Michael&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;你好，麥可&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">zh_greeting</span><span class="o">::</span><span class="n">hello</span><span class="p">(</span><span class="s">&quot;麥可&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Rust 官方文件中提供了另一個更複雜的模組呼叫範例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="c1">// Rename crate</span>
+<span class="k">extern</span><span class="w"> </span><span class="k">crate</span><span class="w"> </span><span class="n">phrases</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">sayings</span><span class="p">;</span><span class="w"></span>
+
+<span class="c1">// Rename module</span>
+<span class="kn">use</span><span class="w"> </span><span class="n">sayings</span><span class="o">::</span><span class="n">japanese</span><span class="o">::</span><span class="n">greetings</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">ja_greetings</span><span class="p">;</span><span class="w"></span>
+
+<span class="c1">// Glob all functions in a module, NOT a good style</span>
+<span class="kn">use</span><span class="w"> </span><span class="n">sayings</span><span class="o">::</span><span class="n">japanese</span><span class="o">::</span><span class="n">farewells</span><span class="o">::*</span><span class="p">;</span><span class="w"></span>
+
+<span class="c1">// A complex renaming scheme</span>
+<span class="kn">use</span><span class="w"> </span><span class="n">sayings</span><span class="o">::</span><span class="n">english</span><span class="o">::</span><span class="p">{</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">greetings</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">en_greetings</span><span class="p">,</span><span class="w"> </span><span class="n">farewells</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">en_farewells</span><span class="p">};</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Hello in English; {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">en_greetings</span><span class="o">::</span><span class="n">hello</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;And in Japanese: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ja_greetings</span><span class="o">::</span><span class="n">hello</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Goodbye in English: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">english</span><span class="o">::</span><span class="n">farewells</span><span class="o">::</span><span class="n">goodbye</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Again: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">en_farewells</span><span class="o">::</span><span class="n">goodbye</span><span class="p">());</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Use a globbed function, AVOID it when possible.</span>
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;And in Japanese: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">goodbye</span><span class="p">());</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>稍微閱讀一下程式碼，大概就知道如何呼叫模組。要注意的是，globbing 的動作，會直接暴露函式名稱到主程式中，喪失使用模組區隔函式名稱的用意，應盡量避免。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="string.html" title="字串"
+             >next</a></li>
+        <li class="right" >
+          <a href="function.html" title="函式"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rust 程式設計從頭開始 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; <a href="../copyright.html">Copyright</a> Michael Chen, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

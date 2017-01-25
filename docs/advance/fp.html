@@ -1,0 +1,456 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-TW">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>函數式程式設計 &#8212; Rust 程式設計從頭開始 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="next" title="巨集" href="macro.html" />
+    <link rel="prev" title="泛型程式設計" href="generics.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="macro.html" title="巨集"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="generics.html" title="泛型程式設計"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rust 程式設計從頭開始 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">函數式程式設計</a><ul>
+<li><a class="reference internal" href="#closure">Closure</a></li>
+<li><a class="reference internal" href="#id2">高階函式</a><ul>
+<li><a class="reference internal" href="#id3">注意事項</a></li>
+<li><a class="reference internal" href="#filter">filter</a></li>
+<li><a class="reference internal" href="#map">map</a></li>
+<li><a class="reference internal" href="#fold">fold</a></li>
+<li><a class="reference internal" href="#zip">zip</a></li>
+<li><a class="reference internal" href="#partition">partition</a></li>
+<li><a class="reference internal" href="#enumerate">enumerate</a></li>
+<li><a class="reference internal" href="#id4">組合數個高階函數</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id5">純函式</a></li>
+<li><a class="reference internal" href="#id6">遞迴</a></li>
+<li><a class="reference internal" href="#lazy-evaluation">Lazy Evaluation</a></li>
+<li><a class="reference internal" href="#id7">型別</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="generics.html"
+                        title="previous chapter">泛型程式設計</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="macro.html"
+                        title="next chapter">巨集</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/advance/fp.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>函數式程式設計<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p><strong>函數式程式設計 (functional programming)</strong> 是另一種程式設計的模式 (paradigm)。此種模式以函數為主體，撰寫時儘量減少狀態改變，以減少程式的臭蟲。不同程式語言對函數式程式設計的支援程度差異相當大；有些語言整體上即以此模式為主，像是 Lisp、Erlang、OCaml、F# 或是 Haskell 等；有些語言雖然不以此模式為主，但提供部分相關的功能，像是 Perl、Python 或是 Java 8 等。雖然 Rust 官方網站上的資料沒有強調 Rust 和函數式程式設計的關係，Rust 也支援許多函數式程式設計的功能。</p>
+<div class="section" id="closure">
+<h2>Closure<a class="headerlink" href="#closure" title="Permalink to this headline">¶</a></h2>
+<p>在 Rust 中，函式也可以是物件，如下例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">add_one</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">|</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="kt">i32</span><span class="o">|</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在上例中，<code class="docutils literal"><span class="pre">add_one</span></code> 是一個<strong>函式物件 (function object)</strong>，透過這個機制，我們可以將函式像物件般存在變數中，之後再呼叫。在 Rust 中，<code class="docutils literal"><span class="pre">add_one</span></code> 即為 <strong>Closure</strong>。在這個範例中 <code class="docutils literal"><span class="pre">|x:</span> <span class="pre">i32|</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">1</span></code> 是以 Closure 的方式撰寫函數，其中 <code class="docutils literal"><span class="pre">|x:</span> <span class="pre">i32|</span></code> 的部分是函數參數，而 <code class="docutils literal"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">1</span></code> 的部分是函數本體；寫 Closure 時，不需要明確指明回傳值，Rust 會自動推斷該有的回傳型別。</p>
+<p><em>註：Rust 的 Closure 型別其實不是函數式程式設計中的</em><strong>閉包 (Closure)</strong><em>，比較好的稱呼應該是函式物件。後文中會用範例展示實質的閉包。為了遵守 Rust 的習慣用法，本書仍沿用 Closure 這個詞彙來指稱 Rust 的函式物件。</em></p>
+<p>若 Closure 內容較長，也可改寫成多行的形式，如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">add_one</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">|</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="kt">i32</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">n</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">n</span><span class="w"></span>
+<span class="w">    </span><span class="p">};</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>或是明確指定回傳型別，如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">add_one</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">|</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="kt">i32</span><span class="o">|</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">n</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">n</span><span class="w"></span>
+<span class="w">    </span><span class="p">};</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>但是 Rust 將函數和 Closure 視為不同的東西，函數不是表達式，而 Closure 是。所以，以下的寫法是錯誤的：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// fn is not an expression.</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">add_one</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="kt">i32</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">n</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">n</span><span class="w"></span>
+<span class="w">    </span><span class="p">};</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>由於 Closure 可以作為值，所以，Closure 也可以做為函式的回傳值。如下例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="kt">i32</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="nb">Fn</span><span class="p">(</span><span class="kt">i32</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">i32</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nb">Box</span><span class="o">::</span><span class="n">new</span><span class="p">(</span><span class="n">move</span><span class="w"> </span><span class="o">|</span><span class="n">n</span><span class="o">|</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>由於 Closure 的型別不能實體化，而要借助 <code class="docutils literal"><span class="pre">Box&lt;T&gt;</span></code> 才能將其實體化。在 Rust 中，Closure 的型別視為一種 trait，和其他的 trait 一樣，本身不能實體化。另外，為了解決 ownership 的問題，Rust 使用 <code class="docutils literal"><span class="pre">move</span></code> 這個關鍵字將變數的所有權移到函式外。</p>
+<p>如果我們想要實作有狀態改變的閉包，Closure 的形別要改為 <code class="docutils literal"><span class="pre">FnMut</span></code>，如下例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="kt">i32</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="nb">FnMut</span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">i32</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="nb">Box</span><span class="o">::</span><span class="n">new</span><span class="p">(</span><span class="n">move</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">n</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">n</span><span class="w"></span>
+<span class="w">    </span><span class="p">})</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">f</span><span class="p">(),</span><span class="w"> </span><span class="mi">6</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">f</span><span class="p">(),</span><span class="w"> </span><span class="mi">7</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">f</span><span class="p">(),</span><span class="w"> </span><span class="mi">8</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在本例中，<code class="docutils literal"><span class="pre">add_one</span></code> 的狀態會存在 <code class="docutils literal"><span class="pre">f</span></code> 物件中，每次執行 <code class="docutils literal"><span class="pre">f</span></code> 時，其內部的 <code class="docutils literal"><span class="pre">n</span></code> 就遞增 1，從外部程式的效果看來，就像是 <code class="docutils literal"><span class="pre">f</span></code> 會遞增一樣。</p>
+<p>除了作為回傳值為，Closure 還可以作為函式的參數，如下例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">my_filter</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">vec</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">[</span><span class="n">T</span><span class="p">],</span><span class="w"> </span><span class="n">f</span><span class="o">:</span><span class="w"> </span><span class="n">F</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="n">where</span><span class="w"> </span><span class="n">F</span><span class="o">:</span><span class="w"> </span><span class="nb">Fn</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">:</span><span class="w"> </span><span class="nb">Copy</span><span class="w">  </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">v</span><span class="o">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Vec</span><span class="o">::</span><span class="n">new</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="p">..(</span><span class="n">vec</span><span class="p">.</span><span class="n">len</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">true</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">v</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">v</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_filter</span><span class="p">(</span><span class="o">&amp;</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="o">|</span><span class="n">x</span><span class="o">|</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">filtered</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">]);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在本範例中，<code class="docutils literal"><span class="pre">my_filter</span></code> 接受 Closure 為參數，並在函式中呼叫該 Closure，透過該Closure 實作的條件將 vector 過濾掉不符條件的值。為了讓函式的介面較簡潔，我們這裡使用泛型函式。<strong>高階函式 (higher-order function)</strong> 以函式為參數或回傳值，在本節中的 <code class="docutils literal"><span class="pre">add_one</span></code> 或是 <code class="docutils literal"><span class="pre">my_filter</span></code> 這種函式就稱為高階函式，高階函式是函數式程式設計中相當重要的應用。Rust 實作了許多高階函式，程式設計者不需要再重頭撰寫程式碼。</p>
+</div>
+<div class="section" id="id2">
+<h2>高階函式<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>高階函式是「使用函式的函式」，在實作上來說，高階函式以函數為參數或回傳值。透過高階函式，可以用很緊湊的程式碼來撰寫程式。許多的高階函式，使用到串列操作的概念。串列是一種線性容器，如下圖：</p>
+<img alt="串列" src="../_images/list.png" />
+<p>對於高階函式的使用者來說，不需要擔心串列的實作。在實務上，高階函數預先寫好相關的串列操作，只要使用者將函式填入參數，即可操作。假設有一個 filter 函數，會過濾掉串列中不符合其條件的元素，示意圖如下：</p>
+<img alt="Filter 函式" src="../_images/filter.png" />
+<p>近年來火紅的大數據運算框架 <a class="reference external" href="http://hadoop.apache.org/">Hadoop</a> 和 <a class="reference external" href="http://spark.apache.org/">Spark</a> 就用到許多高階函數的概念。如以下以 Python 撰寫的 Spark 程式 (摘自 Spark 官網)：</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">text_file</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="p">(</span><span class="s2">&quot;hdfs://...&quot;</span><span class="p">)</span>
+<span class="n">counts</span> <span class="o">=</span> <span class="n">text_file</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">))</span> \
+             <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">word</span><span class="p">:</span> <span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> \
+             <span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">counts</span><span class="o">.</span><span class="n">saveAsTextFile</span><span class="p">(</span><span class="s2">&quot;hdfs://...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>其中的 <code class="docutils literal"><span class="pre">flatMap</span></code>、<code class="docutils literal"><span class="pre">map</span></code>和 <code class="docutils literal"><span class="pre">reduceByKey</span></code> 都是高階函數的例子，而 <code class="docutils literal"><span class="pre">lambda</span></code> 則是函數物件。在不同程式語言中，概念相近的高階函式會用不同名稱來命名，只要有高階函式的概念，再將語法轉換一下即可。</p>
+<div class="section" id="id3">
+<h3>注意事項<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>在 Rust 中，迭代器 (iterator) 和容器 (containter) 是兩種不一樣的型別，高階函數需搭配迭代器，而平常對資料的操作要用容器。一個例子就是 vector 和其 iterator 間的關係。</p>
+<p>接下來，我們會介紹 Rust 中常見的高階函數。</p>
+</div>
+<div class="section" id="filter">
+<h3>filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h3>
+<p>我們在先前有展示過 <code class="docutils literal"><span class="pre">filter</span></code> 的示意圖，<code class="docutils literal"><span class="pre">filter</span></code> 的概念是將串列中不符合條件的元素過濾掉。範例如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// range (1..7) includes 1 but excludes 7</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">..</span><span class="mi">7</span><span class="p">).</span><span class="n">filter</span><span class="p">(</span><span class="o">|</span><span class="n">x</span><span class="o">|</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">).</span><span class="n">collect</span><span class="o">::&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">filtered</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">]);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在本例中，使用 <code class="docutils literal"><span class="pre">filter</span></code> 過濾串列後，再轉為 vector，以利後續程式使用。</p>
+</div>
+<div class="section" id="map">
+<h3>map<a class="headerlink" href="#map" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">map</span></code> 的概念是將串列中每個元素經處理後回傳，示意圖如下：</p>
+<img alt="Map 函式" src="../_images/map.png" />
+<p><em>註：在某些函數式程式設計語言中，使用 apply 函式完成類似的概念。</em></p>
+<p>範例如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">mapped</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">..</span><span class="mi">4</span><span class="p">).</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">x</span><span class="o">|</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">).</span><span class="n">collect</span><span class="o">::&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">mapped</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">]);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fold">
+<h3>fold<a class="headerlink" href="#fold" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">fold</span></code> 的概念是將串列的元素以指定的方式合併，示意圖如下：</p>
+<img alt="Fold 函式" src="../_images/fold.png" />
+<p><em>註：在函數式程式設計語言中，常以 reduce 作為同概念的函數名稱。</em></p>
+<p>範例如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Calculate the sum from 1 to 10</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">reduced</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">..</span><span class="mi">11</span><span class="p">).</span><span class="n">fold</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">|</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="o">|</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">reduced</span><span class="p">,</span><span class="w"> </span><span class="mi">55</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="zip">
+<h3>zip<a class="headerlink" href="#zip" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">zip</span></code> 合併兩個串列後，回傳一個新的串列，該串列的元素為原先兩串列中相同位置的元素組成的 tuple。示意圖如下：</p>
+<img alt="Zip 函式" src="../_images/zip.png" />
+<p>範例如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">number_in_english</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="s">&quot;one&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;two&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;three&quot;</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">number_in_german</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="s">&quot;eins&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;zwei&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;drei&quot;</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">zipped</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">number_in_english</span><span class="p">.</span><span class="n">iter</span><span class="p">().</span><span class="n">zip</span><span class="p">(</span><span class="n">number_in_german</span><span class="p">.</span><span class="n">iter</span><span class="p">());</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">zipped</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="o">&amp;</span><span class="s">&quot;one&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="s">&quot;eins&quot;</span><span class="p">)));</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">zipped</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="o">&amp;</span><span class="s">&quot;two&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="s">&quot;zwei&quot;</span><span class="p">)));</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">zipped</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="o">&amp;</span><span class="s">&quot;three&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="s">&quot;drei&quot;</span><span class="p">)));</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">zipped</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">None</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>要注意的是，在 Rust 中，<code class="docutils literal"><span class="pre">zip</span></code> 傳回的是參考而非值本身，使用時需解參考。</p>
+</div>
+<div class="section" id="partition">
+<h3>partition<a class="headerlink" href="#partition" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">partition</span></code> 根據特定的條件將輸入串列分為兩個新的串列，示意圖如下：</p>
+<img alt="Partition 函式" src="../_images/partition.png" />
+<p>範例如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">odd</span><span class="p">,</span><span class="w"> </span><span class="n">even</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="mi">1</span><span class="p">..</span><span class="mi">11</span><span class="p">).</span><span class="n">partition</span><span class="p">(</span><span class="o">|</span><span class="n">n</span><span class="o">|</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">odd</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">]);</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">even</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">]);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="enumerate">
+<h3>enumerate<a class="headerlink" href="#enumerate" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">enumerate</span></code> 傳回新的串列，其元素為原串列的元素的索引值及該元素本身組成的 tuple，示意圖如下：</p>
+<img alt="Enumerate 函式" src="../_images/enumerate.png" />
+<p>範例如下：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;c&quot;</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">enumerated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="p">.</span><span class="n">iter</span><span class="p">().</span><span class="n">enumerate</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">enumerated</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="s">&quot;a&quot;</span><span class="p">)));</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">enumerated</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="s">&quot;b&quot;</span><span class="p">)));</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">enumerated</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="s">&quot;c&quot;</span><span class="p">)));</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">enumerated</span><span class="p">.</span><span class="n">next</span><span class="p">(),</span><span class="w"> </span><span class="nb">None</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>要注意的是，<code class="docutils literal"><span class="pre">enumerate</span></code> 傳回的是參考而非值本身，使用時需解參考。</p>
+</div>
+<div class="section" id="id4">
+<h3>組合數個高階函數<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>高階函數除了單獨呼叫外，還可以相互組合，達成更複雜的效果。見下例：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">..</span><span class="mi">11</span><span class="p">).</span><span class="n">filter</span><span class="p">(</span><span class="o">|</span><span class="n">x</span><span class="o">|</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                       </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">x</span><span class="o">|</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">                       </span><span class="p">.</span><span class="n">fold</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">|</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="o">|</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">sum</span><span class="p">,</span><span class="w"> </span><span class="p">((</span><span class="mi">1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">7</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">7</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">9</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">9</span><span class="p">)));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>讀者可嘗試用基本的控制結構重新撰寫以上程式，就可以發現到函數式程式設計的程式碼相當緊湊，但對不明白此種模式的程式設計者來說，這種程式碼相對難以閱讀。</p>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>純函式<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<p><strong>純函式 (pure function)</strong> 是函數式程式設計的一個概念，對於純函式來說，只要輸入的參數是相同的，得到的輸出就是相同的；換句話說，純函式沒有<strong>副作用 (side effect)</strong>。副作用在電腦程式中相當常見，像是改變某個物件內在狀態、將結果輸出到終端機、將資料存入外部檔案等；然而，過度依賴函式的副作用，有時候反而造成預期外的錯誤。函數式程式設計的其中一個概念就是減少副作用。</p>
+<p>以下的範例是純函式：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="kt">i32</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="n">x</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="n">x</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">add_one</span><span class="p">(</span><span class="n">x</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在本例中，每次輸入 <code class="docutils literal"><span class="pre">x</span></code>，得到的值都是 6。由於 <code class="docutils literal"><span class="pre">x</span></code> 本身沒有內在狀態，所以，可預期每次輸入的結果都一樣。</p>
+<p>以下的範例不是純函式：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">square_in_place</span><span class="p">(</span><span class="n">vec</span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="p">[</span><span class="kt">i32</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">vec</span><span class="p">.</span><span class="n">iter_mut</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="o">*</span><span class="n">e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{:?}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">]);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">square_in_place</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">]);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">square_in_place</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">vec</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="mi">81</span><span class="p">]);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在本例中，每次輸入 <code class="docutils literal"><span class="pre">vec</span></code> 得到的結果都不同。由於 <code class="docutils literal"><span class="pre">vec</span></code> 本身有內在狀態，而 <code class="docutils literal"><span class="pre">square_in_place</span></code> 有副作用，導致 <code class="docutils literal"><span class="pre">vec</span></code> 輸入的結果會隨輸入次數而改變。</p>
+<p>主流的程式設計模式，像是物件導向等，都是建立在可改變狀態的物件上，而函數式程式設計鼓勵程式設計者撰寫純函式，減少副作用的産生。程式的用途在於操作資料，操作資料的過程就會產生副作用，副作用不會完全消除，但是，下意識地在程式中減少副作用的産生，可減少程式中的臭蟲。</p>
+</div>
+<div class="section" id="id6">
+<h2>遞迴<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>遞迴不是函數式程式設計專有的特性，即使像是 C 這種非函數式程式語言也有遞迴的機制。然而，函數式程式語言支援 <strong>tail-call optimization</strong>，使得遞迴和控制結構達到相近的速度。Rust 目前沒有實作此最佳化機制，但 Rust 社群中對此有相關的討論 (如 Rust <a class="reference external" href="https://github.com/rust-lang/rust/issues/217">Issue 217</a>)。</p>
+</div>
+<div class="section" id="lazy-evaluation">
+<h2>Lazy Evaluation<a class="headerlink" href="#lazy-evaluation" title="Permalink to this headline">¶</a></h2>
+<p>我們舉一個比較特別的例子，來說明什麼是 <strong>lazy evaluation</strong>。以下的 Haskell 程式是正確的：</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="nf">main</span> <span class="ow">=</span> <span class="n">print</span> <span class="n">len</span>
+
+<span class="nf">list</span> <span class="ow">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="o">/</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="nf">len</span> <span class="ow">=</span> <span class="n">length</span> <span class="n">list</span>
+</pre></div>
+</div>
+<p>編譯及執行該程式的步驟如下：</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> ghc -o lazy lazy.hs
+<span class="gp">$</span> ./lazy
+<span class="go">4</span>
+</pre></div>
+</div>
+<p>但等效的 Rust 程式會出錯：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">/</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">].</span><span class="n">len</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>本程式引發以下錯誤：</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">thread &#39;main&#39; panicked at &#39;attempt to divide by zero&#39;</span>
+</pre></div>
+</div>
+<p>其實，如果將以上程式用目前主流的程式語言去改寫，都會引發錯誤，這是因為大部分的程式語言沒有實作 lazy evaluation 的功能。而 Haskell 是少數實作 lazy evaluation 的函數式程式語言之一。</p>
+<p>然而，lazy evaluation 有時候卻很有用，如以下例子：</p>
+<div class="highlight-rust"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">..).</span><span class="n">filter</span><span class="p">(</span><span class="o">|</span><span class="n">x</span><span class="o">|</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">).</span><span class="n">take</span><span class="p">(</span><span class="mi">5</span><span class="p">).</span><span class="n">collect</span><span class="o">::&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;&gt;</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">assert_eq</span><span class="o">!</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="n">vec</span><span class="o">!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">]);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>在本程式中，<code class="docutils literal"><span class="pre">(1..).filter(|x|</span> <span class="pre">x</span> <span class="pre">%</span> <span class="pre">2</span> <span class="pre">!=</span> <span class="pre">0).take(5)</span></code> 的意義是「從 1 開始建立一個無限長的數字串列，每次遞增 1；只取奇數 (odd number)；取前 5 個元素」。若沒有使用 lazy evaluation 的技術，這個程式會變成無法停止的程式。Rust 在某些部份實作 lazy evaluation，其他的部分則無。</p>
+</div>
+<div class="section" id="id7">
+<h2>型別<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<p><strong>型別推論 (type inference)</strong> 也是函數式程式設計的其中一項特色，很多函數式程式語言都內建這項功能，像是 Haskell 或是 OCaml 等，而 Rust 也內建型別推論，使得 Rust 寫起來某種程度上類似高階語言。另外，Rust 中的 trait 也是師法 Haskell 的 type class，trait 在多型及運算子重載等方面都相當地實用。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="macro.html" title="巨集"
+             >next</a></li>
+        <li class="right" >
+          <a href="generics.html" title="泛型程式設計"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rust 程式設計從頭開始 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; <a href="../copyright.html">Copyright</a> Michael Chen, 2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>
