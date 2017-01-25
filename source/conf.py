@@ -146,7 +146,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Rust_Programming.tex', 'Rust 程式設計從頭開始',
+    (master_doc, 'Rust_Programming.tex', u'Rust 程式設計從頭開始',
      'Michael Chen', 'manual'),
 ]
 
@@ -157,7 +157,7 @@ latex_show_urls = 'footnote'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'rust_programming', 'Rust 程式設計從頭開始',
+    (master_doc, 'rust_programming', u'Rust 程式設計從頭開始',
      [author], 1)
 ]
 
@@ -168,7 +168,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Rust', 'Rust 程式設計從頭開始 Documentation',
+    (master_doc, 'Rust', u'Rust 程式設計從頭開始 Documentation',
      author, 'Rust', 'One line description of project.',
      'Miscellaneous'),
 ]
