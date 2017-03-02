@@ -221,7 +221,7 @@ Rust，輸入 ``rustup install nightly``\ 。
 目前支援 Rust 的整合式開發環境 (IDE, Integrated Development Environment) 如下：
 
 - Eclipse
-- Visual Studio
+- Visual Studio (搭配 Visual Rust)
 - IntelliJ IDEA
 
 目前支援 Rust 的編輯器 (editor) 如下：
@@ -232,11 +232,23 @@ Rust，輸入 ``rustup install nightly``\ 。
 - Atom
 - Visual Studio Code
 
+*註：Emacs 及 Vim 上手較為困難，程式設計初學者宜先嘗試其他開發工具。*
+
 對於練習用的程式碼或小型專案，使用編輯器較為輕巧方便，對於中大型專案，IDE 則支援較多的功能。\
 筆者在圖形介面下使用 Atom，在終端機下使用 Emacs，而讀者可自行從中選用喜歡的開發工具，這裡就\
 不列出每個工具的安裝和使用方法。
 
-*註：Emacs 及 Vim 上手較為困難，程式設計初學者宜先嘗試其他開發工具。*
+經筆者在 Windows 平台上實測，即使正確安裝 Rust 編譯環境，Visual Rust 仍然無法直接偵測系統\
+上的 Rust。目前需要手動加入以下機碼 (見\ `此討論串 <https://github.com/PistonDevelopers/VisualRust/issues/263>`_\ )：
+
+.. code-block:: console
+
+   C:\> REG ADD "HKLM\SOFTWARE\Mozilla Foundation\Rust\current" /v InstallDir /t REG_SZ /d "%USERPROFILE%\.cargo"
+
+經過設定後，即可正常使用。但是，現階段不建議使用 Visual Studio + Visual Rust 做為開發工具，\
+因為 Viusal Rust 產生的 Rust 專案不是標準的 Rust 專案，反而需要手動加入相關設定檔，希望 \
+Visual Rust 專案能改善此一問題。而 IntelliJ IDEA 在安裝 Rust 外掛 (plugin) 可正確地\
+偵測到系統上的 Rust，且產生標準的 Rust 專案，若有需要的讀者可自行參考。
 
 ===========================
 Hello World
